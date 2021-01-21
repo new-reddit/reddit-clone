@@ -17,17 +17,22 @@ def setup_db(app, database_path=database_path):
 class User(db.Model):
     __tablename__='users'
     id=Column(Integer,primary_key=True)
+    public_id=db.Column(db.String(50),unique=True)
     user_name=Column(String)
     email=Column(String,unique=True)
-    hash=Column(String)
+    hash=Column(String(100))
     Bio=Column(String)
+    admin=Column(db.Boolean)
 
 
-    def __init__(self, question, answer, category, difficulty):
-        self.question = question
-        self.answer = answer
-        self.category = category
-        self.difficulty = difficulty
+    def __init__(self, public_id, user_name, email,hash,Bio,admin):
+        self.public_id = public_id
+        self.user_name = user_name
+        self.email = email
+        self.hash= hash
+        self.Bio=Bio
+        self.admin=admin
+
 
     def insert(self):
         db.session.add(self)
@@ -42,9 +47,11 @@ class User(db.Model):
 
     def format(self):
         return {
-        'id': self.id,
-        'question': self.question,
-        'answer': self.answer,
-        'category': self.category,
-        'difficulty': self.difficulty
+        'id':self.id,
+        'public_id': self.public_id,
+        'user_name': self.user_name,
+        'email': self.email,
+        'hash': self.hash,
+        'Bio': self.Bio,
+        'admin':self.admin
     }
