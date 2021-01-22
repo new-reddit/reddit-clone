@@ -30,7 +30,7 @@ const  LogIn = ({ login, isAuthenticated }) => {
       setPassword(e.target.value);
       setPasswordErrorMsg('');
     }
-  }
+  };
 
   const validate = (email, password) =>  {
     const validEmailRegex = RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
@@ -43,7 +43,7 @@ const  LogIn = ({ login, isAuthenticated }) => {
       return 0;
     }
     return 1;
-  }
+  };
 
   return (
     <div className="container">
