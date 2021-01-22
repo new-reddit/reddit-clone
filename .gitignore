@@ -1,1 +1,6 @@
-env
+__pycache__/
+*.py[cod]
+instance/
+.webassets-cache
+/Backend/tutorial-env
+/Frontend/node_modules
