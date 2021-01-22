@@ -76,9 +76,10 @@ const  LogIn = ({ login, isAuthenticated }) => {
       <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
     </div>
   );
-}
+};
 
 const mapStateToProps = state => ({
   isAuthenticated: state.user.isAuthenticated
 });
+
 export default connect(mapStateToProps, { login })(LogIn);
