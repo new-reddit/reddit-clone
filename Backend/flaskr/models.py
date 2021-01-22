@@ -5,7 +5,7 @@ import bcrypt
 import json
 
 
-database_path='postgres://postgres:postgres@localhost:5432/social_network'
+database_path='postgres://postgres:123456@localhost:5432/social_network'
 db = SQLAlchemy()
 def setup_db(app, database_path=database_path):
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path

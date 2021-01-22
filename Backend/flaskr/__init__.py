@@ -7,9 +7,10 @@ import datetime
 from functools import wraps
 from uuid import uuid4
 import sys
-
+from flask_cors import CORS
 
 app=Flask(__name__)
+CORS(app)
 setup_db(app)
 app.config['SECRET_KEY']='topsecret'
 flask_bcrypt=Bcrypt(app)
@@ -39,32 +40,33 @@ def signup():
     user_name=body.get('user_name', None)
     Bio=body.get('Bio', None)
     if not email:
-        return jsonify({'message':'enter email '})
+        return make_response('Email must be provided',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     if not password:
-        return jsonify({'message':' enter a password '})
+        return make_response('Password must be provided',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     if User.query.filter_by(email=email).one_or_none():
-        return jsonify({'message':'user already registered '})
+        return make_response('An account with this email already exists',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
     hashed =flask_bcrypt.generate_password_hash(password).decode('utf-8')
+
     user=User(public_id=str(uuid4()),user_name=user_name,email=email,hash=hashed,Bio=Bio,admin=False)
     user.insert()
     token = jwt.encode({'public_id' : user.public_id, 'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes = 1440)},app.config['SECRET_KEY'])
-    return jsonify ({'token': token})
+    return jsonify ({'token': token, 'user':user.user_name})
+
 
 @app.route('/login',methods=['POST'])
 def login():
-    auth=request.authorization
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
-    email=auth.username
-    password=auth.password
+    # auth=request.authorization
+    # if not auth or not auth.username or not auth.password:
+    #     return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    body=request.get_json()
+    email=body.get('email', None)
+    password=body.get('password', None)
     user=User.query.filter_by(email=email).one_or_none()
-    print(user.hash, file=sys.stderr)
-    print(password, file=sys.stderr)
     if user is None:
-        return jsonify({'message':'user not found ','email':auth.username})
+        return make_response('User is not found',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     if flask_bcrypt.check_password_hash(user.hash, password):
         token = jwt.encode({'public_id' : user.public_id, 'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes = 1440)},app.config['SECRET_KEY'])
-        return jsonify ({'token': token})
+        return jsonify ({'token': token, 'user':user.user_name})
 
-    return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    return make_response('Invalid credentials',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
