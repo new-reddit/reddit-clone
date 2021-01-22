@@ -67,6 +67,6 @@ def login():
         return make_response('User is not found',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     if flask_bcrypt.check_password_hash(user.hash, password):
         token = jwt.encode({'public_id' : user.public_id, 'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes = 1440)},app.config['SECRET_KEY'])
-        return jsonify ({'token': token, 'user':user.user_name})
+        return jsonify({'token': token, 'user':user.user_name})
 
     return make_response('Invalid credentials',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
