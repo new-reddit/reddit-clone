@@ -46,11 +46,10 @@ def signup():
         return jsonify({'message':'user already registered '})
 
     hashed =flask_bcrypt.generate_password_hash(password).decode('utf-8')
-
     user=User(public_id=str(uuid4()),user_name=user_name,email=email,hash=hashed,Bio=Bio,admin=False)
     user.insert()
-
-    return jsonify({'data':user.format()})
+    token = jwt.encode({'public_id' : user.public_id, 'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes = 1440)},app.config['SECRET_KEY'])
+    return jsonify ({'token': token})
 
 @app.route('/login',methods=['POST'])
 def login():

@@ -17,10 +17,10 @@ def setup_db(app, database_path=database_path):
 class User(db.Model):
     __tablename__='users'
     id=Column(Integer,primary_key=True)
-    public_id=db.Column(db.String(50),unique=True)
+    public_id=Column(db.String(50),unique=True)
     user_name=Column(String)
     email=Column(String,unique=True)
-    hash=Column(String(100))
+    hash=Column(String())
     Bio=Column(String)
     admin=Column(db.Boolean)
 
