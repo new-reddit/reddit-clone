@@ -4,7 +4,7 @@ import alert from './alert';
 
 const rootReducer = combineReducers({
   user,
-  alert
+  alert,
 });
 
 export default rootReducer;
