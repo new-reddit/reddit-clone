@@ -1,6 +1,6 @@
 from flask import Flask,request,jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
-from . models import User,setup_db
+from . models import User,setup_db,Post,Comment
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime
@@ -14,6 +14,8 @@ CORS(app)
 setup_db(app)
 app.config['SECRET_KEY']='topsecret'
 flask_bcrypt=Bcrypt(app)
+
+
 def token_reqiured(f):
     @wraps(f)
     def decorated(*args,**kwargs):
@@ -25,10 +27,11 @@ def token_reqiured(f):
             return jsonify({'message' : 'Token is missing '}) , 401
 
         try:
-            data = jwt.decode(token,app.config['SECRET_KEY'])
+            data = jwt.decode(token,app.config['SECRET_KEY'],algorithms=["HS256"])
             current_user = User.query.filter_by(public_id = data['public_id']).first()
         except:
-            return jsonify({'message' : 'Token is invalid!'}) , 401
+            return jsonify({'message' : 'Invalid token '}) , 401
+
         return f(current_user, *args , **kwargs)
     return decorated
 
@@ -56,9 +59,6 @@ def signup():
 
 @app.route('/login',methods=['POST'])
 def login():
-    # auth=request.authorization
-    # if not auth or not auth.username or not auth.password:
-    #     return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     body=request.get_json()
     email=body.get('email', None)
     password=body.get('password', None)
@@ -70,3 +70,49 @@ def login():
         return jsonify({'token': token, 'user':user.user_name})
 
     return make_response('Invalid credentials',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+
+@app.route('/create/post', methods=['POST'])
+@token_reqiured
+def create_post(current_user):
+    body=request.get_json()
+    post_body=body.get('post_body', None)
+    title=body.get('title' , None)
+    post=Post(post_body=post_body,title=title,user_id=current_user.id)
+    post.insert()
+    return jsonify({'post': post.format(),'name':current_user.user_name})
+
+
+
+@app.route('/create/comment/post/<int:post_id>', methods=['POST'])
+@token_reqiured
+def create_comment(current_user,post_id):
+    body=request.get_json()
+    comment_body=body.get('comment_body', None)
+    comment=Comment(comment_body=comment_body,user_id=current_user.id,post_id=post_id,user_name=current_user.user_name)
+    comment.insert()
+    post=Post.query.filter(Post.id == post_id).first()
+    post.comments_count += 1
+    post.update()
+    return jsonify({'name': current_user.user_name, 'comment' : comment.format()})
+
+@app.route('/u/<string:public_id>')
+def get_dashboard(public_id):
+    user = User.query.filter(User.public_id == public_id).first()
+    posts = Post.query.filter(Post.user_id == user.id).order_by(Post.id).all()
+    posts_formated=[post.format() for post in posts]
+    return jsonify({'posts':posts_formated,'user' : user.user_name})
+
+@app.route('/post/<int:post_id>')
+def get_post(post_id):
+    post=Post.query.filter(Post.id == post_id ).first()
+    comments=Comment.query.filter(Post.id == post_id).all()
+    comments_formated=[comment.format() for comment in comments]
+    return jsonify({'post':post.format(),'comments' : comments_formated, 'name' : user.user_name })
+
+@app.route('/u/<string:public_id>/comments')
+def get_comments(public_id):
+    user = User.query.filter(User.public_id == public_id).first()
+    comments = Comment.query.filter(Comment.user_id == user.id ).order_by(Comment.id).all()
+    comments_formated=[comment.format() for comment in comments]
+    return jsonify({'comments' : comments_formated, 'name' : user.user_name})
