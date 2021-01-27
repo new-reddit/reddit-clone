@@ -21,22 +21,19 @@ class User(db.Model):
     public_id = Column(db.String(50),unique=True)
     user_name = Column(String)
     email = Column(String,unique=True)
-    hash = Column(String())
+    hash = Column(String)
     Bio = Column(String)
-    admin = Column(db.Boolean)
+    karma = Column(Integer , default = 0)
     posts = db.relationship('Post', backref = 'user')
     comments = db.relationship('Comment', backref = 'user')
     created_at = Column(DateTime, default = datetime.datetime.utcnow() )
 
 
-    def __init__(self, public_id, user_name, email,hash,Bio,admin):
+    def __init__(self, public_id, user_name, email,hash):
         self.public_id = public_id
         self.user_name = user_name
         self.email = email
         self.hash= hash
-        self.Bio=Bio
-        self.admin=admin
-
 
     def insert(self):
         db.session.add(self)
@@ -57,7 +54,7 @@ class User(db.Model):
         'email': self.email,
         'hash': self.hash,
         'Bio': self.Bio,
-        'admin':self.admin,
+        'karma': self.karma,
         'created_at' : self.created_at
         }
 
@@ -109,6 +106,7 @@ class Comment(db.Model):
     user_id = Column(Integer , db.ForeignKey('users.id'))
     post_id = Column(Integer , db.ForeignKey('posts.id'))
     votes = Column(Integer , default = 0)
+    voters = db.relationship('Voter' , backref = 'comment')
     created_at = Column(DateTime, default = datetime.datetime.utcnow() )
 
 
@@ -173,3 +171,25 @@ class Community(db.Model):
         'creator_id':self.user_id,
         'created_at':self.created_at
         }
+class Voter(db.Model):
+    __tablename__ = 'voters'
+    id = Column(Integer,primary_key=True)
+    user_id = Column(Integer)
+    vote_type = Column(String)
+    comment_id = Column(Integer , db.ForeignKey('comments.id'))
+
+    def __init__(self, user_id , vote_type ,comment_id):
+        self.user_id = user_id
+        self.vote_type = vote_type
+        self.comment_id = comment_id
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
