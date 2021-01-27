@@ -12,6 +12,7 @@ import store from './redux/store';
 import { Provider } from 'react-redux';
 import { loadUser } from './redux/actions/user';
 import './app.scss';
+import PostPage from './components/PostPage';
 
 const App = () => {
   useEffect(() => {
@@ -28,6 +29,7 @@ const App = () => {
           <Route path='/login' exact component={Login} />
           <Route path='/signup' exact component={SignUp} />
           <PrivateRoute path='/dashboard' exact component={Dashboard} />
+          <Route path='/post/:id' exact component={PostPage} />
         </Switch>
       </Router>
     </Provider>

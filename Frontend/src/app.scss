@@ -216,8 +216,8 @@ form {
     background-color: #2a5c6e;
     border-radius: 5px;
     li {
-      cursor: pointer;
       padding: 1rem;
+      cursor: pointer;
       height: 100%;
       &:hover {
         background-color: #2f4858;
@@ -252,13 +252,86 @@ form {
       font-size: 0.8rem;
       color: #5f807f;
       display: flex;
-      p + p {
+      p + p,
+      a {
         margin-left: 1rem;
+      }
+      a {
+        color: #5f807f;
       }
     }
   }
 
   .post-body {
     margin-top: 10px;
+  }
+}
+
+// Comment
+.comment {
+  margin-top: 10px;
+  background-color: #cacfd8;
+  padding: 1rem;
+  border-radius: 5px;
+  .comment-header {
+    display: flex;
+    align-items: center;
+    .voting {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.5rem;
+      i {
+        color: #2a5c6e;
+        cursor: pointer;
+      }
+    }
+    .comment-meta-info {
+      font-size: 0.8rem;
+      color: #5f807f;
+      display: flex;
+      p + p {
+        margin-left: 1rem;
+      }
+    }
+  }
+  .comment-body {
+    margin-top: 10px;
+  }
+}
+
+.add-comment {
+  margin-top: 10px;
+  textarea {
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+  }
+  button {
+    width: 150px;
+    margin-left: auto;
+  }
+}
+
+// Communities
+.communities {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-gap: 1rem;
+  .community {
+    border-radius: 5px;
+    padding: 1rem;
+    border: 1px solid #000;
+    text-align: center;
+    a {
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    p {
+      color: #393939;
+    }
   }
 }
