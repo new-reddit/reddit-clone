@@ -1,6 +1,6 @@
 from flask import Flask,request,jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
-from . models import User,setup_db,Post,Comment
+from . models import User,Post,Comment,Voter,setup_db
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime
@@ -41,7 +41,6 @@ def signup():
     email=body.get('email', None)
     password=body.get('password', None)
     user_name=body.get('user_name', None)
-    Bio=body.get('Bio', None)
     if not email:
         return make_response('Email must be provided',400,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     if not password:
@@ -51,7 +50,7 @@ def signup():
 
     hashed =flask_bcrypt.generate_password_hash(password).decode('utf-8')
 
-    user=User(public_id=str(uuid4()),user_name=user_name,email=email,hash=hashed,Bio=Bio,admin=False)
+    user=User(public_id=str(uuid4()),user_name=user_name,email=email,hash=hashed)
     user.insert()
     token = jwt.encode({'public_id' : user.public_id, 'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes = 1440)},app.config['SECRET_KEY'])
     return jsonify ({'token': token, 'user':user.user_name})
@@ -71,6 +70,19 @@ def login():
 
     return make_response('Invalid credentials',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
+@app.route('/u/<string:public_id>')
+def get_dashboard(public_id):
+    user = User.query.filter(User.public_id == public_id).first()
+    posts = Post.query.filter(Post.user_id == user.id).order_by(Post.id).all()
+    posts_formated=[post.format() for post in posts]
+    return jsonify({'posts':posts_formated,'user' : user.user_name})
+
+@app.route('/u/<string:public_id>/comments')
+def get_comments(public_id):
+    user = User.query.filter(User.public_id == public_id).first()
+    comments = Comment.query.filter(Comment.user_id == user.id ).order_by(Comment.id).all()
+    comments_formated=[comment.format() for comment in comments]
+    return jsonify({'comments' : comments_formated, 'name' : user.user_name})
 
 @app.route('/create/post', methods=['POST'])
 @token_reqiured
@@ -82,7 +94,12 @@ def create_post(current_user):
     post.insert()
     return jsonify({'post': post.format(),'name':current_user.user_name})
 
-
+@app.route('/post/<int:post_id>')
+def get_post(post_id):
+    post=Post.query.filter(Post.id == post_id ).first()
+    comments=Comment.query.filter(Comment.post_id == post_id).all()
+    comments_formated=[comment.format() for comment in comments]
+    return jsonify({'post':post.format(),'comments' : comments_formated})
 
 @app.route('/create/comment/post/<int:post_id>', methods=['POST'])
 @token_reqiured
@@ -96,23 +113,55 @@ def create_comment(current_user,post_id):
     post.update()
     return jsonify({'name': current_user.user_name, 'comment' : comment.format()})
 
-@app.route('/u/<string:public_id>')
-def get_dashboard(public_id):
-    user = User.query.filter(User.public_id == public_id).first()
-    posts = Post.query.filter(Post.user_id == user.id).order_by(Post.id).all()
-    posts_formated=[post.format() for post in posts]
-    return jsonify({'posts':posts_formated,'user' : user.user_name})
+@app.route('/vote/comment/<int:id>/<string:type>', methods=['PUT'])
+@token_reqiured
+def vote(current_user,id,type):
+    voter = Voter.query.filter(Voter.user_id == current_user.id).filter(Voter.comment_id == id).one_or_none()
+    comment = Comment.query.filter(Comment.id == id).first()
+    if current_user.id == comment.user_id:
+        return jsonify({'message':'Cannot vote your own comment'})
+    if voter is not None:
+        if type == "down" and voter.vote_type == "down":
+            comment.votes += 1
+            current_user.karma += 1
+            comment.update()
+            voter.delete()
+            current_user.update()
+            return jsonify({'votes' : comment.votes})
+        elif type == "up" and voter.vote_type == "up":
+            comment.votes -= 1
+            current_user.karma -= 1
+            comment.update()
+            voter.delete()
+            current_user.update()
+            return jsonify({'votes' : comment.votes})
+        elif type == "up" and voter.vote_type == "down":
+            comment.votes += 2
+            current_user.karma += 2
+            voter.vote_type = "up"
+            voter.update()
+            comment.update()
+            current_user.update()
+            return jsonify({'votes' : comment.votes})
+        elif type == "down" and voter.vote_type == "up":
+            comment.votes -= 2
+            current_user.karma -= 2
+            voter.vote_type = "down"
+            voter.update()
+            comment.update()
+            current_user.update()
+            return jsonify({'votes' : comment.votes})
 
-@app.route('/post/<int:post_id>')
-def get_post(post_id):
-    post=Post.query.filter(Post.id == post_id ).first()
-    comments=Comment.query.filter(Post.id == post_id).all()
-    comments_formated=[comment.format() for comment in comments]
-    return jsonify({'post':post.format(),'comments' : comments_formated, 'name' : user.user_name })
+    if type == 'up':
+        comment.votes += 1
+        current_user.karma += 1
+    else :
+        comment.votes -= 1
+        current_user.karma -= 1
 
-@app.route('/u/<string:public_id>/comments')
-def get_comments(public_id):
-    user = User.query.filter(User.public_id == public_id).first()
-    comments = Comment.query.filter(Comment.user_id == user.id ).order_by(Comment.id).all()
-    comments_formated=[comment.format() for comment in comments]
-    return jsonify({'comments' : comments_formated, 'name' : user.user_name})
+    new_voter = Voter(user_id = current_user.id , vote_type = type , comment_id = id)
+    new_voter.insert()
+    comment.update()
+    current_user.update()
+
+    return jsonify({'votes' : comment.votes})
