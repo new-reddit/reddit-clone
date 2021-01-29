@@ -10,7 +10,7 @@ function AllCommunities() {
   }, []);
   return (
     <div className='container'>
-      <div className='communities'>
+      <div className='tile is-ancestor is-flex is-flex-wrap-wrap'>
         {communities.map((community) => (
           <Community key={community.id} community={community} />
         ))}

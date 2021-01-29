@@ -60,64 +60,89 @@ const SignUp = ({ register, isAuthenticated }) => {
   };
 
   return (
-    <div className='form-container'>
+    <div className='container is-max-desktop mt-4 p-4'>
       <form onSubmit={handleSubmit} noValidate>
-        <h1>Sign Up</h1>
-        <label htmlFor='firstName'>First Name</label>
-        <input
-          type='text'
-          name='firstName'
-          placeholder='Enter your first name'
-          value={firstName}
-          onChange={handleChange}
-        />
-        {firstNameErrorMsg ? (
-          <span className='error'>{firstNameErrorMsg}</span>
-        ) : null}
-        <label htmlFor='lastName'>Last Name</label>
-        <input
-          type='text'
-          name='lastName'
-          placeholder='Enter your last name'
-          value={lastName}
-          onChange={handleChange}
-        />
-        {lastNameErrorMsg ? (
-          <span className='error'>{lastNameErrorMsg}</span>
-        ) : null}
-        <label htmlFor='userName'>User Name</label>
-        <input
-          type='text'
-          name='userName'
-          placeholder='Enter your User Name'
-          value={userName}
-          onChange={handleChange}
-        />
-        {userNameErrorMsg ? (
-          <span className='error'>{userNameErrorMsg}</span>
-        ) : null}
-
-        <label htmlFor='email'>Email</label>
-        <input
-          type='email'
-          name='email'
-          placeholder='Enter your email address'
-          value={email}
-          onChange={handleChange}
-        />
-        {emailErrorMsg ? <span className='error'>{emailErrorMsg}</span> : null}
-        <label htmlFor='password'>Password</label>
-        <input
-          type='password'
-          name='password'
-          placeholder='Enter your password'
-          value={password}
-          onChange={handleChange}
-        />
-        {passwordErrorMsg ? (
-          <span className='error'>{passwordErrorMsg}</span>
-        ) : null}
-        <button>Sign Up</button>
+        <div className='field'>
+          <label htmlFor='firstName' className='label'>
+            First Name
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='firstName'
+            placeholder='Enter your first name'
+            value={firstName}
+            onChange={handleChange}
+          />
+          {firstNameErrorMsg ? (
+            <p className='has-text-danger help'>{firstNameErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='lastName' className='label'>
+            Last Name
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='lastName'
+            placeholder='Enter your last name'
+            value={lastName}
+            onChange={handleChange}
+          />
+          {lastNameErrorMsg ? (
+            <p className='has-text-danger help'>{lastNameErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='userName' className='label'>
+            User Name
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='userName'
+            placeholder='Enter your User Name'
+            value={userName}
+            onChange={handleChange}
+          />
+          {userNameErrorMsg ? (
+            <p className='has-text-danger help'>{userNameErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='email' className='label'>
+            Email
+          </label>
+          <input
+            className='input'
+            type='email'
+            name='email'
+            placeholder='Enter your email address'
+            value={email}
+            onChange={handleChange}
+          />
+          {emailErrorMsg ? (
+            <p className='has-text-danger help'>{emailErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='password' className='label'>
+            Password
+          </label>
+          <input
+            className='input'
+            type='password'
+            name='password'
+            placeholder='Enter your password'
+            value={password}
+            onChange={handleChange}
+          />
+          {passwordErrorMsg ? (
+            <p className='has-text-danger help'>{passwordErrorMsg}</p>
+          ) : null}
+        </div>
+        <button className='button is-success'>Sign Up</button>
       </form>
       <p>
         Have an account? <Link to='/login'>Login</Link>

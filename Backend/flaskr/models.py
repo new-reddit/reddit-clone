@@ -33,7 +33,8 @@ class User(db.Model):
     comments = db.relationship('Comment', backref='user')
     communities = db.relationship(
         'Community', secondary='members', backref=db.backref('users', lazy='dynamic'))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow())
+    created_at = Column(
+        String, default=datetime.date.today().strftime("%d-%m-%Y"))
 
     def __init__(self, public_id, first_name, last_name, user_name, email, hash):
         self.public_id = public_id
@@ -208,11 +209,13 @@ class Voter(db.Model):
     user_id = Column(Integer)
     vote_type = Column(String)
     comment_id = Column(Integer, db.ForeignKey('comments.id'))
+    post_id = Column(Integer, db.ForeignKey('posts.id'))
 
-    def __init__(self, user_id, vote_type, comment_id):
+    def __init__(self, user_id, vote_type, comment_id=None, post_id=None):
         self.user_id = user_id
         self.vote_type = vote_type
         self.comment_id = comment_id
+        self.post_id = post_id
 
     def insert(self):
         db.session.add(self)

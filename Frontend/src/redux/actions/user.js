@@ -96,7 +96,10 @@ export const loadUser = () => (dispatch) => {
     );
     dispatch({
       type: USER_LOAD_SUCCESS,
-      payload: localStorage.getItem('token'),
+      payload: {
+        token: localStorage.getItem('token'),
+        userName: localStorage.getItem('userName'),
+      },
     });
   } else {
     dispatch({

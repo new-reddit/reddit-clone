@@ -12,7 +12,7 @@ import CreatePost from './components/CreatePost';
 import store from './redux/store';
 import { Provider } from 'react-redux';
 import { loadUser } from './redux/actions/user';
-import './app.scss';
+// import './app.scss';
 import PostPage from './components/PostPage';
 import CommunityPage from './components/CommunityPage';
 import NotFound from './components/NotFound';
@@ -28,7 +28,7 @@ const App = () => {
         <Alert />
         <Switch>
           <Route path='/communities' exact component={AllCommunities} />
-          <Route path='/' exact component={Home} />
+          <Route path='/home' exact component={Home} />
           <Route path='/login' exact component={Login} />
           <Route path='/signup' exact component={SignUp} />
           <Route path='/create-community' exact component={CreateCommunity} />

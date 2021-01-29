@@ -13,7 +13,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 setup_db(app)
-app.config['SECRET_KEY'] = 'topsecret'
+app.config['SECRET_KEY'] = 'DWVR<WuZd4n3SD=G5C./:&"X)~Gw[@'
 flask_bcrypt = Bcrypt(app)
 
 
@@ -101,9 +101,8 @@ def get_posts(user_name):
 
 @app.route('/u/<string:user_name>/comments')
 def get_comments(user_name):
-    user = User.query.filter(User.user_name == user_name).first()
     comments = Comment.query.filter(
-        Comment.user_id == user.id).order_by(Comment.id).all()
+        Comment.user_name == user_name).all()
     comments_formated = [comment.format() for comment in comments]
     return jsonify({'comments': comments_formated})
 
@@ -123,12 +122,30 @@ def get_user_communities(user_name):
     return jsonify({'communities': user_communities})
 
 
+@app.route('/home')
+@token_reqiured
+def get_home(user):
+    communities = user.communities
+    posts = []
+    for community in communities:
+        for post in community.posts:
+            posts.append(post)
+    print(posts, file=sys.stderr)
+    posts_formatted = [post.format() for post in posts]
+    return jsonify({'posts': posts_formatted})
+
+
 @app.route('/create/post', methods=['POST'])
 @token_reqiured
 def create_post(user):
     body = request.get_json()
     post_body = body.get('post_body', None)
     title = body.get('title', None)
+    if post_body is None:
+        return make_response('Post body can not be empty', 400)
+    if title is None:
+        return make_response('Title can not be empty', 400)
+
     post = Post(post_body=post_body, title=title,
                 user_id=user.id, user_name=user.user_name)
     post.insert()
@@ -153,6 +170,62 @@ def delete_post(user, post_id):
     return make_response('Cannot delete other users post', 400)
 
 
+@app.route('/vote/post/<int:id>/<string:type>', methods=['PUT'])
+@token_reqiured
+def vote_post(user, id, type):
+    voter = Voter.query.filter(Voter.user_id == user.id).filter(
+        Voter.post_id == id).one_or_none()
+    post = Post.query.filter(Post.id == id).first()
+    user_voted_for = User.query.filter(
+        User.user_name == post.user_name).first()
+    if user.id == post.user_id:
+        return make_response('Cannot vote your own post', 400)
+    if voter is not None:
+        if type == "down" and voter.vote_type == "down":
+            post.votes += 1
+            user_voted_for.karma += 1
+            post.update()
+            voter.delete()
+            user_voted_for.update()
+            return jsonify({'post': post.format()})
+        elif type == "up" and voter.vote_type == "up":
+            post.votes -= 1
+            user_voted_for.karma -= 1
+            post.update()
+            voter.delete()
+            user_voted_for.update()
+            return jsonify({'post': post.format()})
+        elif type == "up" and voter.vote_type == "down":
+            post.votes += 2
+            user_voted_for.karma += 2
+            voter.vote_type = "up"
+            voter.update()
+            post.update()
+            user_voted_for.update()
+            return jsonify({'post': post.format()})
+        elif type == "down" and voter.vote_type == "up":
+            post.votes -= 2
+            user_voted_for.karma -= 2
+            voter.vote_type = "down"
+            voter.update()
+            post.update()
+            user_voted_for.update()
+            return jsonify({'post': post.format()})
+
+    if type == 'up':
+        post.votes += 1
+        user_voted_for.karma += 1
+    else:
+        post.votes -= 1
+        user_voted_for.karma -= 1
+
+    new_voter = Voter(user_id=user.id, vote_type=type, post_id=id)
+    new_voter.insert()
+    post.update()
+    user_voted_for.update()
+    return jsonify({'post': post.format()})
+
+
 @app.route('/post/<int:post_id>')
 def get_post(post_id):
     post = Post.query.filter(Post.id == post_id).first()
@@ -171,7 +244,9 @@ def create_comment(user, post_id):
     comment = Comment(comment_body=comment_body, user_id=user.id,
                       post_id=post_id, user_name=user.user_name)
     comment.insert()
-    post = Post.query.filter(Post.id == post_id).first()
+    post = Post.query.filter(Post.id == post_id).one_or_none()
+    if post is None:
+        return make_response('Post not found', 404)
     post.comments_count += 1
     post.update()
     return jsonify({'comment': comment.format()})
@@ -197,14 +272,14 @@ def delete_comment(user, post_id, comment_id):
 
 @app.route('/vote/comment/<int:id>/<string:type>', methods=['PUT'])
 @token_reqiured
-def vote(user, id, type):
+def vote_comment(user, id, type):
     voter = Voter.query.filter(Voter.user_id == user.id).filter(
         Voter.comment_id == id).one_or_none()
     comment = Comment.query.filter(Comment.id == id).first()
     user_voted_for = User.query.filter(
         User.user_name == comment.user_name).first()
     if user.id == comment.user_id:
-        return jsonify({'message': 'Cannot vote your own comment'})
+        return make_response('Cannot vote your own comment', 400)
     if voter is not None:
         if type == "down" and voter.vote_type == "down":
             comment.votes += 1
@@ -247,8 +322,7 @@ def vote(user, id, type):
     new_voter = Voter(user_id=user.id, vote_type=type, comment_id=id)
     new_voter.insert()
     comment.update()
-    user.update()
-
+    user_voted_for.update()
     return jsonify({'votes': comment.votes})
 
 
@@ -260,14 +334,14 @@ def create_community(user):
     description = body.get('description', None)
     topic = body.get('topic', None)
     if name is None:
-        return jsonify({'message': "Community name cannot be empty"})
+        return make_response('Community name cannot be empty', 400)
     if description is None:
-        return jsonify({'message': "Community description cannot be empty"})
+        return make_response('Community description cannot be empty', 400)
     if topic is None:
-        return jsonify({'message': "Community topic cannot be empty"})
+        return make_response('Community topic cannot be empty', 400)
     if Community.query.filter(Community.name == name.lower().replace(
             " ", "")).one_or_none() is not None:
-        return jsonify({'message': "Community with that name already exist"})
+        return make_response('A community with that name already exists', 400)
 
     community = Community(name=name.lower().replace(
         " ", ""), title=name, description=description, topic=topic, admin=user.user_name)

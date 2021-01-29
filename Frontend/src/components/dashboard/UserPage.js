@@ -17,7 +17,7 @@ const UserPage = ({ user: { loading, isAuthenticated } }) => {
     }
     const res = await axios.get(`http://localhost:5000/u/${userName}`);
     setProfile(res.data.user);
-  }, []);
+  }, [userName]);
   if (!isAuthenticated) {
     return <Redirect to='/login' />;
   }
@@ -45,26 +45,33 @@ const UserPage = ({ user: { loading, isAuthenticated } }) => {
   return loading && profile === null ? (
     <img src={Spinner} alt='Loading' />
   ) : (
-    <div className='container'>
-      <div className='user'>
-        <div className='user-info'>
-          <p>
-            <span>Name</span>: {profile.user_name}
+    <div className='container p-4'>
+      <div className='card has-background-grey-lighter'>
+        <div className='card-content'>
+          <p className='title'>
+            {profile.first_name + ' ' + profile.last_name}{' '}
           </p>
-          <p>
-            <span>Karma</span>: {profile.karma}
+          <p className='subtitle'>@{profile.user_name}</p>
+          <p className='subtitle'>
+            <span className='has-text-weight-bold'>Karma: </span>
+            {profile.karma}
           </p>
-          <p>
-            <span>Joined at</span>: {profile.created_at}
+          <p className='subtitle'>
+            <span className='has-text-weight-bold'>Joined at: </span>
+            {profile.created_at}
           </p>
         </div>
       </div>
-      <div className='dashboard-nav'>
-        <ul>
-          <li onClick={handleClick}>Posts</li>
-          <li onClick={handleClick}>Comments</li>
-          <li onClick={handleClick}>Communities</li>
-        </ul>
+      <div className='buttons mt-2'>
+        <button className='button is-link' onClick={handleClick}>
+          Posts
+        </button>
+        <button className='button is-link' onClick={handleClick}>
+          Comments
+        </button>
+        <button className='button is-link' onClick={handleClick}>
+          Communities
+        </button>
       </div>
       {selectedView()}
     </div>

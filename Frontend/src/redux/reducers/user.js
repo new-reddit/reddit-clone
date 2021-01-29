@@ -6,7 +6,6 @@ import {
   LOG_OUT,
   USER_LOAD_FAIL,
   USER_LOAD_SUCCESS,
-  LOAD_USER_PROFILE,
 } from '../actions/types';
 
 const initialState = {
@@ -30,9 +29,10 @@ const user = (state = initialState, { type, payload }) => {
     case USER_LOAD_SUCCESS:
       return {
         ...state,
-        token: payload,
+        token: payload.token,
         isAuthenticated: true,
         loading: false,
+        userName: payload.userName,
       };
     case REGISTER_FAIL:
     case LOGIN_FAIL:

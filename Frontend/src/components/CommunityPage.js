@@ -44,47 +44,53 @@ const CommunityPage = ({ isAuthenticated, history, setAlert }) => {
       `http://localhost:5000/delete/community/${community.name}`
     );
     setAlert({ data: 'Community has been deleted' }, 'success');
-    history.push('/');
+    history.push('/home');
   };
   return (
-    <div className='container'>
-      <div className='community-container'>
-        <div className='community-posts'>
-          {posts.map((post) => (
-            <Post key={post.id} post={post} />
-          ))}
-        </div>
-        <div>
-          <div className='community-info'>
-            <h2>{community.title}</h2>
-            <p>{community.description}</p>
-            <p>
-              <span>Number Of Members: </span> {community.members_count}
-            </p>
-            {isAdmin ? (
+    <div className='container is-flex is-flex-wrap-wrap'>
+      <div className='is-flex-grow-1 mr-2'>
+        {posts.length ? (
+          posts.map((post) => <Post key={post.id} post={post} />)
+        ) : (
+          <p className='title'>There are no posts here!</p>
+        )}
+      </div>
+      <div>
+        <div className='card px-5'>
+          <h2 className='title'>{community.title}</h2>
+          <p className='subtitle'>{community.description}</p>
+          <p>Members: {community.members_count}</p>
+          {isAuthenticated ? (
+            isAdmin ? (
               <button
+                className='button is-danger my-2'
                 onClick={deleteCommunity}
-                style={{ background: '#CF4155' }}
               >
                 Delete Community
               </button>
-            ) : isAuthenticated && isJoined ? (
-              <button onClick={leave}>Leave</button>
+            ) : isJoined ? (
+              <button className='button is-danger my-2' onClick={leave}>
+                Leave
+              </button>
             ) : (
-              <button onClick={join}>Join</button>
-            )}
-          </div>
-          {isAuthenticated && (isJoined || isAdmin) ? (
-            <Link
-              className='create-post'
-              to={`/create/post/community/${community.name}`}
-            >
-              Create Post
-            </Link>
+              <button onClick={join} className='button is-success my-2'>
+                Join
+              </button>
+            )
           ) : (
             ''
           )}
         </div>
+        {isAuthenticated && (isJoined || isAdmin) ? (
+          <Link
+            className='button button is-link mt-2'
+            to={`/create/post/community/${community.name}`}
+          >
+            Create Post
+          </Link>
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );

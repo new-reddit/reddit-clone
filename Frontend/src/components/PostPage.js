@@ -50,8 +50,9 @@ const PostPage = ({ isAuthenticated, setAlert, history }) => {
     <div className='container'>
       <Post post={post} />
       {isAuthenticated ? (
-        <form className='add-comment' onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <textarea
+            className='textarea mt-2'
             value={comment}
             onChange={handleChange}
             name='comment'
@@ -59,7 +60,7 @@ const PostPage = ({ isAuthenticated, setAlert, history }) => {
             rows='5'
             placeholder='Add a comment'
           ></textarea>
-          <button>Add</button>
+          <button className='button mt-2 is-link ml-0'>Add</button>
         </form>
       ) : (
         ''

@@ -51,39 +51,59 @@ const CreateCommunity = ({ setAlert, history, isAuthenticated }) => {
     }
   };
   return (
-    <div className='form-container'>
+    <div className='container is-max-desktop mt-4 p-4'>
       <form onSubmit={handleSubmit}>
-        <h2>Create Community</h2>
-        <label htmlFor='name'>Name</label>
-        <input
-          type='text'
-          name='name'
-          placeholder='Enter name of community'
-          value={name}
-          onChange={handleChange}
-        />
-        {nameErrorMsg ? <span className='error'>{nameErrorMsg}</span> : null}
-        <label htmlFor='description'>Description</label>
-        <input
-          type='text'
-          name='description'
-          placeholder='Enter desciption of community'
-          value={description}
-          onChange={handleChange}
-        />
-        {descriptionErrorMsg ? (
-          <span className='error'>{descriptionErrorMsg}</span>
-        ) : null}
-        <label htmlFor='name'>Topic</label>
-        <input
-          type='text'
-          name='topic'
-          placeholder='Enter topic of community'
-          value={topic}
-          onChange={handleChange}
-        />
-        {topicErrorMsg ? <span className='error'>{topicErrorMsg}</span> : null}
-        <button>Create Community</button>
+        <h2 className='title'>Create Community</h2>
+        <div className='field'>
+          <label htmlFor='name' className='label'>
+            Name
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='name'
+            placeholder='Enter name of community'
+            value={name}
+            onChange={handleChange}
+          />
+          {nameErrorMsg ? (
+            <p className='help has-text-danger'>{nameErrorMsg}</p>
+          ) : null}
+        </div>
+
+        <div className='field'>
+          <label htmlFor='description' className='label'>
+            Description
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='description'
+            placeholder='Enter desciption of community'
+            value={description}
+            onChange={handleChange}
+          />
+          {descriptionErrorMsg ? (
+            <p className='help has-text-danger'>{descriptionErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='name' className='label'>
+            Topic
+          </label>
+          <input
+            className='input'
+            type='text'
+            name='topic'
+            placeholder='Enter topic of community'
+            value={topic}
+            onChange={handleChange}
+          />
+          {topicErrorMsg ? (
+            <p className='help has-text-danger'>{topicErrorMsg}</p>
+          ) : null}
+        </div>
+        <button className='button is-success'>Create Community</button>
       </form>
     </div>
   );
