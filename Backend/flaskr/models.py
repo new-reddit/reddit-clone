@@ -22,17 +22,23 @@ class User(db.Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     public_id = Column(db.String(50), unique=True)
-    user_name = Column(String)
+    first_name = Column(String)
+    last_name = Column(String)
+    user_name = Column(String, unique=True)
     email = Column(String, unique=True)
     hash = Column(String)
     Bio = Column(String)
     karma = Column(Integer, default=0)
     posts = db.relationship('Post', backref='user')
     comments = db.relationship('Comment', backref='user')
+    communities = db.relationship(
+        'Community', secondary='members', backref=db.backref('users', lazy='dynamic'))
     created_at = Column(DateTime, default=datetime.datetime.utcnow())
 
-    def __init__(self, public_id, user_name, email, hash):
+    def __init__(self, public_id, first_name, last_name, user_name, email, hash):
         self.public_id = public_id
+        self.first_name = first_name
+        self.last_name = last_name
         self.user_name = user_name
         self.email = email
         self.hash = hash
@@ -52,6 +58,8 @@ class User(db.Model):
         return {
             'id': self.id,
             'public_id': self.public_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
             'user_name': self.user_name,
             'email': self.email,
             'hash': self.hash,
@@ -67,16 +75,18 @@ class Post(db.Model):
     post_body = Column(String)
     title = Column(String)
     votes = Column(Integer, default=0)
+    user_name = Column(String)
     comments = db.relationship('Comment', backref='post')
     comments_count = Column(Integer, default=0)
     user_id = Column(Integer, db.ForeignKey('users.id'))
-    community_id = Column(Integer, db.ForeignKey('communities.id'))
+    community_name = Column(String, db.ForeignKey('communities.name'))
     created_at = Column(DateTime, default=datetime.datetime.utcnow())
 
-    def __init__(self, post_body, title, user_id):
+    def __init__(self, post_body, title, user_id, user_name):
         self.post_body = post_body
         self.title = title
         self.user_id = user_id
+        self.user_name = user_name
 
     def insert(self):
         db.session.add(self)
@@ -95,8 +105,10 @@ class Post(db.Model):
             'post_body': self.post_body,
             'title': self.title,
             'votes': self.votes,
+            'user_name': self.user_name,
             'comments_count': self.comments_count,
             'user_id': self.user_id,
+            'community_name': self.community_name,
             'created_at': self.created_at
         }
 
@@ -144,16 +156,21 @@ class Comment(db.Model):
 class Community(db.Model):
     __tablename__ = 'communities'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, unique=True)
+    title = Column(String)
     description = Column(String)
+    admin = Column(String)
+    topic = Column(String)
+    members_count = Column(Integer, default=1)
     posts = db.relationship('Post', backref='community')
     created_at = Column(DateTime, default=datetime.datetime.utcnow())
-    creator_id = Column(Integer)
 
-    def __init__(self, name, description, creator_id):
+    def __init__(self, name, title, description, topic, admin):
         self.name = name
+        self.title = title
         self.description = description
-        self.creator_id = creator_id
+        self.admin = admin
+        self.topic = topic
 
     def insert(self):
         db.session.add(self)
@@ -168,12 +185,21 @@ class Community(db.Model):
 
     def format(self):
         return {
-            'id': self.id,
             'name': self.name,
+            'title': self.title,
             'description': self.description,
-            'creator_id': self.user_id,
+            'topic': self.topic,
+            'members_count': self.members_count,
+            'admin': self.admin,
             'created_at': self.created_at
         }
+
+
+class Member(db.Model):
+    __tablename__ = 'members'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, db.ForeignKey('users.id'))
+    community_id = Column(Integer, db.ForeignKey('communities.id'))
 
 
 class Voter(db.Model):

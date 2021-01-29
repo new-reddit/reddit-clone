@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Post from '../Post';
-import { connect } from 'react-redux';
 
-const Posts = ({ posts }) => {
+const Posts = () => {
+  const [posts, setPosts] = useState([]);
+  useEffect(async () => {
+    const res = await axios.get(
+      `http://localhost:5000/u/${localStorage.getItem('userName')}/posts`
+    );
+    setPosts(res.data.posts);
+  }, []);
   return (
     <div className='posts'>
       {posts.map((post) => (
@@ -12,8 +19,4 @@ const Posts = ({ posts }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  posts: state.user.profile.posts,
-});
-
-export default connect(mapStateToProps)(Posts);
+export default Posts;

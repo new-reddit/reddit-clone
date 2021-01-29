@@ -12,7 +12,7 @@ import {
 const initialState = {
   isAuthenticated: null,
   token: null,
-  profile: null,
+  userName: null,
   loading: true,
 };
 
@@ -23,15 +23,16 @@ const user = (state = initialState, { type, payload }) => {
       return {
         ...state,
         token: payload.token,
+        userName: payload.user_name,
         isAuthenticated: true,
-        laoding: false,
+        loading: false,
       };
     case USER_LOAD_SUCCESS:
       return {
         ...state,
         token: payload,
         isAuthenticated: true,
-        laoding: false,
+        loading: false,
       };
     case REGISTER_FAIL:
     case LOGIN_FAIL:
@@ -40,21 +41,15 @@ const user = (state = initialState, { type, payload }) => {
         ...state,
         isAuthenticated: false,
         token: null,
-        laoding: false,
-        profile: null,
+        loading: false,
+        userName: null,
       };
     case USER_LOAD_FAIL:
       return {
         ...state,
         isAuthenticated: false,
-        laoding: false,
-        profile: null,
-      };
-    case LOAD_USER_PROFILE:
-      return {
-        ...state,
-        profile: payload,
-        laoding: false,
+        loading: false,
+        userName: null,
       };
     default:
       return state;

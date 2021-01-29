@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { logOut } from '../../redux/actions/user';
 import { connect } from 'react-redux';
 
-const Header = ({ isAuthenticated, logOut }) => {
+const Header = ({ isAuthenticated, logOut, userName }) => {
   const [open, setOpen] = useState(false);
   const openHamburgerMenu = (e) => {
     setOpen(true);
@@ -32,11 +32,16 @@ const Header = ({ isAuthenticated, logOut }) => {
           <Link to='/communities'>Communities</Link>
         </li>
         {isAuthenticated ? (
-          <li>
-            <Link to='#!' onClick={logOut}>
-              Log Out
-            </Link>
-          </li>
+          <>
+            <li>
+              <Link to={`/u/${userName}`}>Dashboard</Link>
+            </li>
+            <li>
+              <Link to='#!' onClick={logOut}>
+                Log Out
+              </Link>
+            </li>
+          </>
         ) : (
           <>
             <li>
@@ -54,5 +59,6 @@ const Header = ({ isAuthenticated, logOut }) => {
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.user.isAuthenticated,
+  userName: state.user.userName,
 });
 export default connect(mapStateToProps, { logOut })(Header);

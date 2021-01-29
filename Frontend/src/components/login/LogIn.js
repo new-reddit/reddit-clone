@@ -13,7 +13,7 @@ const Login = ({ login, isAuthenticated }) => {
 
   const { email, password } = formData;
   if (isAuthenticated) {
-    return <Redirect to='/dashboard' />;
+    return <Redirect to='/' />;
   }
   const handleSubmit = (e) => {
     e.preventDefault();

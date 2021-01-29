@@ -6,10 +6,10 @@ import {
   LOG_OUT,
   USER_LOAD_FAIL,
   USER_LOAD_SUCCESS,
-  LOAD_USER_PROFILE,
 } from './types';
 import axios from 'axios';
 import { setToken } from '../../utils/setToken';
+import { setUserName } from '../../utils/setUserName';
 import { setAlert } from '../actions/alert';
 
 export const login = ({ email, password }) => async (dispatch) => {
@@ -30,6 +30,7 @@ export const login = ({ email, password }) => async (dispatch) => {
       payload: res.data,
     });
     setToken(res.data.token);
+    setUserName(res.data.user_name);
     dispatch(loadUser());
   } catch (error) {
     dispatch(setAlert(error.response, 'danger'));
@@ -39,15 +40,22 @@ export const login = ({ email, password }) => async (dispatch) => {
   }
 };
 
-export const register = ({ name, email, password }) => async (dispatch) => {
-  const user_name = name;
+export const register = ({
+  firstName,
+  lastName,
+  userName,
+  email,
+  password,
+}) => async (dispatch) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
   const newUser = {
-    user_name,
+    first_name: firstName,
+    last_name: lastName,
+    user_name: userName,
     email,
     password,
   };
@@ -59,6 +67,7 @@ export const register = ({ name, email, password }) => async (dispatch) => {
       payload: res.data,
     });
     setToken(res.data.token);
+    setUserName(res.data.user_name);
     dispatch(loadUser());
   } catch (error) {
     dispatch(setAlert(error.response, 'danger'));
@@ -71,6 +80,9 @@ export const register = ({ name, email, password }) => async (dispatch) => {
 export const logOut = () => (dispatch) => {
   if (localStorage.token) {
     localStorage.removeItem('token');
+  }
+  if (localStorage.userName) {
+    localStorage.removeItem('userName');
   }
   dispatch({
     type: LOG_OUT,
@@ -90,18 +102,5 @@ export const loadUser = () => (dispatch) => {
     dispatch({
       type: USER_LOAD_FAIL,
     });
-  }
-};
-
-export const loadUserProfile = () => async (dispatch) => {
-  try {
-    const res = await axios.get('http://localhost:5000/u');
-    console.log(res.data);
-    dispatch({
-      type: LOAD_USER_PROFILE,
-      payload: res.data,
-    });
-  } catch (error) {
-    console.log(error);
   }
 };

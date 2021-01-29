@@ -24,10 +24,20 @@ a {
   color: #000;
 }
 
+textarea {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
 ul {
   list-style: none;
 }
 
+.my-1 {
+  margin-top: 10px;
+}
 button {
   background-color: #39b296;
   cursor: pointer;
@@ -47,7 +57,7 @@ button {
 
 // Header
 .header {
-  padding: 1em 8em;
+  padding: 0.2em 8em;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -137,6 +147,9 @@ form {
     margin: 2rem;
     font-size: 3rem;
   }
+  h2 {
+    margin: 2rem;
+  }
   label {
     margin-top: 0.7rem;
     margin-bottom: 0.4rem;
@@ -187,11 +200,6 @@ form {
       justify-content: center;
     }
   }
-  img {
-    width: 15rem;
-    max-width: 100%;
-    height: 15rem;
-  }
   .user-info {
     p {
       font-size: 1.2rem;
@@ -230,6 +238,7 @@ form {
 }
 
 .post {
+  position: relative;
   margin-top: 10px;
   background-color: #fff;
   padding: 1rem;
@@ -252,13 +261,21 @@ form {
       font-size: 0.8rem;
       color: #5f807f;
       display: flex;
-      p + p,
+      p,
       a {
-        margin-left: 1rem;
+        margin-right: 1rem;
       }
       a {
         color: #5f807f;
       }
+    }
+    .delete {
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #d11c33;
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 
@@ -274,6 +291,7 @@ form {
   padding: 1rem;
   border-radius: 5px;
   .comment-header {
+    position: relative;
     display: flex;
     align-items: center;
     .voting {
@@ -295,6 +313,14 @@ form {
         margin-left: 1rem;
       }
     }
+    .delete {
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #d11c33;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+    }
   }
   .comment-body {
     margin-top: 10px;
@@ -303,12 +329,6 @@ form {
 
 .add-comment {
   margin-top: 10px;
-  textarea {
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: none;
-    font-size: 1rem;
-  }
   button {
     width: 150px;
     margin-left: auto;
@@ -332,6 +352,70 @@ form {
     }
     p {
       color: #393939;
+    }
+  }
+}
+
+.create-community {
+  font-size: 1.2rem;
+  width: 250px;
+  margin: 10px auto;
+  text-align: center;
+  color: #fff;
+  background-color: #39b296;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  &:hover {
+    background-color: #1b9d94;
+  }
+}
+.community-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  .community-posts {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  .community-info {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    padding: 1rem 1rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background-color: #fff;
+    border-radius: 5px;
+    flex-direction: column;
+    @media screen and (max-width: 960px) {
+      & {
+        justify-content: center;
+        flex-grow: 1;
+      }
+    }
+    p {
+      font-size: 1rem;
+      border: 1px solid #2a5c6e;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      border-radius: 5px;
+      display: flex;
+      span {
+        font-weight: bold;
+      }
+    }
+  }
+  .create-post {
+    font-size: 1.2rem;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    background-color: #39b296;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    &:hover {
+      background-color: #1b9d94;
     }
   }
 }
