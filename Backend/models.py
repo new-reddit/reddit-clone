@@ -6,7 +6,7 @@ import bcrypt
 import json
 import datetime
 
-database_path = 'postgres://postgres:123456@localhost:5432/social_network'
+database_path = 'postgres://alwpbzdfhisldl:c0985a95fc4ca3f9f7dac6009bddee5c86b046cd0e2a31e837e3c599895c4483@ec2-52-205-145-201.compute-1.amazonaws.com:5432/d2vlno6uf6pop0'
 db = SQLAlchemy()
 
 
