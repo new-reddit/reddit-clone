@@ -13,7 +13,7 @@ const Login = ({ login, isAuthenticated }) => {
 
   const { email, password } = formData;
   if (isAuthenticated) {
-    return <Redirect to='/dashboard' />;
+    return <Redirect to='/home' />;
   }
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,30 +43,43 @@ const Login = ({ login, isAuthenticated }) => {
   };
 
   return (
-    <div className='form-container'>
+    <div className='container is-max-desktop mt-4 p-4'>
       <form onSubmit={handleSubmit} noValidate>
-        <h1>Login</h1>
-        <label htmlFor='email'>Email</label>
-        <input
-          type='email'
-          name='email'
-          placeholder='Enter your email address'
-          value={email}
-          onChange={handleChange}
-        />
-        {emailErrorMsg ? <span className='error'>{emailErrorMsg}</span> : null}
-        <label htmlFor='password'>Password</label>
-        <input
-          type='password'
-          name='password'
-          placeholder='Enter your password'
-          value={password}
-          onChange={handleChange}
-        />
-        {passwordErrorMsg ? (
-          <span className='error'>{passwordErrorMsg}</span>
-        ) : null}
-        <button>Login</button>
+        <div className='field'>
+          <label htmlFor='email' className='label'>
+            Email
+          </label>
+          <div className='control'>
+            <input
+              className='input'
+              type='email'
+              name='email'
+              placeholder='Enter your email address'
+              value={email}
+              onChange={handleChange}
+            />
+          </div>
+          {emailErrorMsg ? (
+            <p className='help has-text-danger'>{emailErrorMsg}</p>
+          ) : null}
+        </div>
+        <div className='field'>
+          <label htmlFor='password' className='label'>
+            Password
+          </label>
+          <input
+            className='input'
+            type='password'
+            name='password'
+            placeholder='Enter your password'
+            value={password}
+            onChange={handleChange}
+          />
+          {passwordErrorMsg ? (
+            <p className='help has-text-danger'>{passwordErrorMsg}</p>
+          ) : null}
+        </div>
+        <button className='button is-success'>Login</button>
       </form>
       <p>
         Don't have an account? <Link to='/signup'>Sign Up</Link>

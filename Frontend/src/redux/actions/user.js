@@ -9,6 +9,7 @@ import {
 } from './types';
 import axios from 'axios';
 import { setToken } from '../../utils/setToken';
+import { setUserName } from '../../utils/setUserName';
 import { setAlert } from '../actions/alert';
 
 export const login = ({ email, password }) => async (dispatch) => {
@@ -29,6 +30,8 @@ export const login = ({ email, password }) => async (dispatch) => {
       payload: res.data,
     });
     setToken(res.data.token);
+    setUserName(res.data.user_name);
+    dispatch(loadUser());
   } catch (error) {
     dispatch(setAlert(error.response, 'danger'));
     dispatch({
@@ -37,15 +40,22 @@ export const login = ({ email, password }) => async (dispatch) => {
   }
 };
 
-export const register = ({ name, email, password }) => async (dispatch) => {
-  const user_name = name;
+export const register = ({
+  firstName,
+  lastName,
+  userName,
+  email,
+  password,
+}) => async (dispatch) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
   const newUser = {
-    user_name,
+    first_name: firstName,
+    last_name: lastName,
+    user_name: userName,
     email,
     password,
   };
@@ -56,7 +66,9 @@ export const register = ({ name, email, password }) => async (dispatch) => {
       type: REGISTER_SUCCESS,
       payload: res.data,
     });
-    setToken(res.data);
+    setToken(res.data.token);
+    setUserName(res.data.user_name);
+    dispatch(loadUser());
   } catch (error) {
     dispatch(setAlert(error.response, 'danger'));
     dispatch({
@@ -66,9 +78,11 @@ export const register = ({ name, email, password }) => async (dispatch) => {
 };
 
 export const logOut = () => (dispatch) => {
-  console.log('logged out');
   if (localStorage.token) {
     localStorage.removeItem('token');
+  }
+  if (localStorage.userName) {
+    localStorage.removeItem('userName');
   }
   dispatch({
     type: LOG_OUT,
@@ -77,10 +91,15 @@ export const logOut = () => (dispatch) => {
 
 export const loadUser = () => (dispatch) => {
   if (localStorage.getItem('token')) {
-    axios.defaults.common['x-access-token'] = localStorage.getItem('token');
+    axios.defaults.headers.common['x-auth-token'] = localStorage.getItem(
+      'token'
+    );
     dispatch({
       type: USER_LOAD_SUCCESS,
-      payload: localStorage.getItem('token'),
+      payload: {
+        token: localStorage.getItem('token'),
+        userName: localStorage.getItem('userName'),
+      },
     });
   } else {
     dispatch({
