@@ -56,10 +56,17 @@ def signup():
         return make_response('First Name must be provided', 400)
     if not last_name:
         return make_response('Last Name must be provided', 400)
+    if not user_name:
+        return make_response('User_name must be provided', 400)
+
 
     if User.query.filter_by(email=email).one_or_none():
         return make_response('An account with this email already exists', 400)
 
+
+    if User.query.filter_by(user_name=user_name).one_or_none():
+        return make_response('An account with this user_name already exists', 400)
+      
     hashed = flask_bcrypt.generate_password_hash(password).decode('utf-8')
 
     user = User(public_id=str(uuid4()), first_name=first_name, last_name=last_name, user_name=user_name,
@@ -360,6 +367,9 @@ def delete_community(user, community_name):
         return make_response('Community not found', 404)
     if community.admin != user.user_name:
         return make_response('Only admins are allowed to delete community', 400)
+
+    for post in community.posts:
+        post.delete()
     community.delete()
     return jsonify({'message': 'Community successfully deleted'})
 
