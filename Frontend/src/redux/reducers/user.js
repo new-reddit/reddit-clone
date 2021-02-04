@@ -1,18 +1,38 @@
-import { LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_FAIL, REGISTER_SUCCESS, LOG_OUT, USER_LOAD_FAIL, USER_LOAD_SUCCESS } from '../actions/types';
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  REGISTER_FAIL,
+  REGISTER_SUCCESS,
+  LOG_OUT,
+  USER_LOAD_FAIL,
+  USER_LOAD_SUCCESS,
+} from '../actions/types';
 
 const initialState = {
   isAuthenticated: null,
   token: null,
+  userName: null,
+  loading: true,
 };
 
-const user = (state = initialState, {type, payload}) => {
+const user = (state = initialState, { type, payload }) => {
   switch (type) {
     case REGISTER_SUCCESS:
     case LOGIN_SUCCESS:
       return {
         ...state,
         token: payload.token,
-        isAuthenticated: true
+        userName: payload.user_name,
+        isAuthenticated: true,
+        loading: false,
+      };
+    case USER_LOAD_SUCCESS:
+      return {
+        ...state,
+        token: payload.token,
+        isAuthenticated: true,
+        loading: false,
+        userName: payload.userName,
       };
     case REGISTER_FAIL:
     case LOGIN_FAIL:
@@ -20,17 +40,16 @@ const user = (state = initialState, {type, payload}) => {
       return {
         ...state,
         isAuthenticated: false,
-        token: null
-      };
-    case USER_LOAD_SUCCESS:
-      return {
-        ...state,
-        isAuthenticated: true
+        token: null,
+        loading: false,
+        userName: null,
       };
     case USER_LOAD_FAIL:
       return {
         ...state,
-        isAuthenticated: false
+        isAuthenticated: false,
+        loading: false,
+        userName: null,
       };
     default:
       return state;

@@ -1,18 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import './alert.styles.scss';
 
 const Alert = ({ alerts }) => {
   return (
-    alerts !== null && alerts.length > 0 && alerts.map(alert => (
-      <div key={alert.id} className={`alert alert-${alert.type}`}>
-        {alert.msg.data}
-      </div>
-    ))
+    <div className='container is-max-desktop p-4'>
+      {alerts !== null &&
+        alerts.length > 0 &&
+        alerts.map((alert) => (
+          <div key={alert.id} className='notification is-danger'>
+            {alert.msg.data}
+          </div>
+        ))}
+    </div>
   );
 };
 
 const mapStateToProps = (state) => ({
-  alerts: state.alert
+  alerts: state.alert,
 });
 export default connect(mapStateToProps)(Alert);

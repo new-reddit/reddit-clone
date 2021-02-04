@@ -1,21 +1,21 @@
 import { SET_ALERT, REMOVE_ALERT } from './types';
 import { v4 as uuid } from 'uuid';
 
-export const setAlert = (msg, type) => dispatch => {
+export const setAlert = (msg, type) => (dispatch) => {
   const id = uuid();
   dispatch({
     type: SET_ALERT,
     payload: {
       msg,
       type,
-      id
-    }
+      id,
+    },
   });
 
   setTimeout(() => {
     dispatch({
       type: REMOVE_ALERT,
-      payload: id
+      payload: id,
     });
   }, 3000);
 };

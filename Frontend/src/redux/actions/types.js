@@ -7,3 +7,5 @@ export const REMOVE_ALERT = 'REMOVE_ALERT';
 export const LOG_OUT = 'LOG_OUT';
 export const USER_LOAD_FAIL = 'USER_LOAD_FAIL';
 export const USER_LOAD_SUCCESS = 'USER_LOAD_SUCCESS';
+export const CREATE_POST = 'CREATE_POST';
+export const LOAD_USER_PROFILE = 'LOAD_USER_PROFILE';
